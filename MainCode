@@ -1,0 +1,173 @@
+// CAMPO MINADO
+#include<iostream>
+#include<stdlib.h>
+#include<windows.h>
+#include<time.h>
+
+#define TAM 10
+#define bomba 20
+
+
+using namespace std;
+
+int main()
+{
+    if (TAM < 2 or bomba < 2) {
+        cout << "Tamanhos definidos de forma invalida, o `TAM` e `bomba` tem que ser maior que 2.";
+        return 0;
+    }
+    int matrizMapa[TAM][TAM], ordem[TAM][TAM], contadorEspacoVazio, x1, y1, i, k, contadorBomba = bomba, jogadas = 0;
+    srand(time(NULL));
+    //Igualar as duas matrizes a zero
+    for (i = 0; i < TAM; i++) {
+        for (k = 0; k < TAM; k++) {
+            matrizMapa[i][k] = 0;
+            ordem[i][k] = 0;
+        }
+    }
+    //Randomizacao das bombas
+    for (i = 0; i < contadorBomba; i++) {
+        do {
+            x1 = rand() % (TAM-1);                                //|-1 -1 | -1 0 | -1+1 |
+            y1 = rand() % (TAM-1);                                //|0  -1 | 100  | 0 +1 |
+        } while (matrizMapa[y1][x1] == 100);                      //|+1 -1 | +1 0 | +1 +1|
+        matrizMapa[y1][x1] = 100;
+        for (int j = -1; j < 2; j++) {//For Y que vai de -1 ate 1
+            for (int l = -1; l < 2; l++) {//For X que vai de -1 ate 1
+                if (((y1 + j) >= 0) and ((y1 + j) < TAM) and ((x1 + l) >= 0) and ((x1 + l) < TAM) and (matrizMapa[y1 + j][x1 + l] != 100)) {//Verificar se os valores das coordenadas estao dentro dos limites e nao sao bombas
+                    matrizMapa[y1 + j][x1 + l]++;
+                }
+            }
+        }
+    }
+    x1 = 0;
+    y1 = 0;
+    contadorEspacoVazio = (TAM * TAM) - bomba; //Calculo para definir o contador de espaco vazio
+    do {
+        cout << "&&&& CAMPO MINADO &&&&&" << endl << endl;
+        cout << endl << "** Quantidade de espaco vazio: " << contadorEspacoVazio<<".";
+        cout << endl << "** Quantidade de bombas: " << contadorBomba<<".";
+        cout << endl << "** Quantidade de jogadas: " << jogadas<<".";
+        cout << endl << "** Ultima jogada realizada. Linha: " << y1 << ". Coluna: " << x1 << "." << endl;
+        for (i = 0; i < TAM + 1; i++) {//For com TAM + 1 para numerar as colunas e linhas
+            for (k = 0; k < TAM + 1; k++) { //For com TAM + 1 para numerar as colunas e linhas
+                if (i == 0) { //Numeracao das colunas
+                    if (k == 0) {//If e elses para formatacao
+                        cout << "   |";
+                    }
+                    else if (k >= 101) {
+                        cout << k - 1 << "|";
+                    }
+                    else if (k >= 11) {
+                        cout << " " << k - 1 << "|";
+                    }
+                    else if (k >= 1) {
+                        cout << "  " << k - 1 << "|";
+                    }
+                }
+                else if (i != 0 and k == 0) { //Numeracao das linhas
+                    if (i >= 101) {//If e elses para formatacao
+                        cout << i - 1 << "|";
+                    }
+                    else if (i >= 11) {
+                        cout << " " << i - 1 << "|";
+                    }
+                    else if (i >= 1) {
+                        cout << "  " << i - 1 << "|";
+                    }
+                }
+                else if (i != 0 and k != 0) { //Preenchimento do tabuleiro
+                    if (ordem[i - 1][k - 1] == 100) {//Caso a casa seja igual a uma bomba (100)
+                        cout << " x |";
+                        contadorBomba--;
+                    }
+                    else if (ordem[i - 1][k - 1] > 0) { //Caso a casa seja maior que espaco vazio (0), mostrara o numero de bombas ao redor
+                        cout << " " << ordem[i - 1][k - 1] << " |";
+                    }
+                    else if (ordem[i - 1][k - 1] == 0) { //Caso a casa seja um espaco vazio, ou seja, nao foi `revelado` ainda
+                        cout << "   |";
+                    }
+                    else {
+                        cout << "GGG|"; //Caso a casa for um espaco vazio ja selecionado
+                    }
+                }
+            }
+            cout << endl; //Quebra de linha para formar o tabuleiro
+        }
+        if (contadorBomba == bomba and contadorEspacoVazio != 0) {
+            do {
+                cout << endl << endl << "**Digite a coluna desejada: ";
+                cin >> x1;
+                cout << endl << endl << "** Digite a linha desejada: ";
+                cin >> y1;
+            } while ((x1 < 0 or y1 < 0) or (x1 > TAM or y1 > TAM));
+            ordem[y1][x1] = matrizMapa[y1][x1];
+            if (ordem[y1][x1] == 0) {
+                ordem[y1][x1]--;
+                contadorEspacoVazio--;
+            }else if(ordem[y1][x1]>0 and ordem[y1][x1]<100 ){
+                contadorEspacoVazio--;
+            }
+            system("cls");
+            jogadas++;
+        }
+    } while (contadorEspacoVazio != 0 and contadorBomba == bomba);
+    if (contadorBomba < bomba) {
+        system("cls");
+        for (i = 0; i < TAM + 1; i++) {//For com TAM + 1 para numerar as colunas e linhas
+            for (k = 0; k < TAM + 1; k++) { //For com TAM + 1 para numerar as colunas e linhas
+                if (i == 0) { //Numeracao das colunas
+                    if (k == 0) {//If e elses para formatacao
+                        cout << "   |";
+                    }
+                    else if (k >= 101) {
+                        cout << k - 1 << "|";
+                    }
+                    else if (k >= 11) {
+                        cout << " " << k - 1 << "|";
+                    }
+                    else if (k >= 1) {
+                        cout << "  " << k - 1 << "|";
+                    }
+                }
+                else if (i != 0 and k == 0) {
+                    if (i >= 101) {
+                        cout << i - 1 << "|";
+                    }
+                    else if (i >= 11) {
+                        cout << " " << i - 1 << "|";
+                    }
+                    else if (i >= 1) {
+                        cout << "  " << i - 1 << "|";
+                    }
+                }
+                else if (i != 0 and k != 0) {
+                    if (matrizMapa[i - 1][k - 1] == 100) {
+                        cout << " x |";
+                        contadorBomba--;
+                    }
+                    else if (matrizMapa[i - 1][k - 1] > 0) {
+                        cout << " " << matrizMapa[i - 1][k - 1] << " |";
+                    }
+                    else if (ordem[i - 1][k - 1] == 0) {
+                        cout << "   |";
+                    }
+                }
+            }
+            cout << endl;
+        }
+        cout << endl << endl << "Voce acertou a bomba da coluna " << x1 << ". E da linha " << y1 << ".";
+        cout << endl << "Voce jogou " << jogadas << " rodadas. Mais sorte da proxima vez!" << endl << endl;
+    }
+    else {
+        cout << "Parabens!! Voce preencheu todos os espacos vazios sem acertar uma bomba em " << jogadas << " jogadas!";
+    }
+
+    return 0;
+}
+
+
+
+
+
+
